@@ -25,9 +25,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     targetCompatibility = JavaVersion.VERSION_17
                 }
 
-                buildFeatures {
-                    compose = true
-                }
             }
 
             extensions.configure<KotlinAndroidProjectExtension> {

@@ -1,6 +1,6 @@
 package com.example.ui.model
 
-import com.example.common.presentation.BaseState
+import com.example.presentation.BaseState
 
 sealed class ScannerState : BaseState {
     data object Idle : ScannerState()
