@@ -1,6 +1,6 @@
 package com.example.ui.model
 
-import com.example.common.presentation.BaseIntent
+import com.example.presentation.BaseIntent
 
 sealed class DashboardIntent : BaseIntent {
     object LoadData : DashboardIntent()

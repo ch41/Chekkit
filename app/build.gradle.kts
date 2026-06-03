@@ -4,10 +4,10 @@ plugins {
 }
 
 android {
-    namespace = "com.example.aiapplication"
+    namespace = "com.aiapplication.app"
 
     defaultConfig {
-        applicationId = "com.example.aiapplication"
+        applicationId = "com.aiapplication.app"
         versionCode = 1
         versionName = "1.0"
     }

@@ -1,6 +1,6 @@
 package com.example.ui.viewModel
 
-import com.example.common.presentation.BaseViewModel
+import com.example.presentation.BaseViewModel
 import com.example.ui.model.ScannerEffect
 import com.example.ui.model.ScannerIntent
 import com.example.ui.model.ScannerState

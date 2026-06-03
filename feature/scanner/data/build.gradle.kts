@@ -1,10 +1,9 @@
 plugins {
     id("aiapplication.android.library")
-    alias(libs.plugins.compose.compiler)
 }
 
 android {
-    namespace = "com.example.scanner.data"
+    namespace = "com.aiapplication.feature.scanner.data"
 }
 
 dependencies {
@@ -14,4 +13,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(libs.androidx.core.ktx)
+
+    implementation(project(":core:common"))
+    implementation(project(":feature:scanner:domain"))
 }

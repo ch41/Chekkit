@@ -1,4 +1,4 @@
-package com.example.common.presentation
+package com.example.presentation
 
 /**
  * Базовый маркер для состояния экрана

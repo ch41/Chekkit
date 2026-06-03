@@ -24,12 +24,12 @@ gradlePlugin {
             implementationClass = "com.aiapplication.conventions.AndroidLibraryConventionPlugin"
         }
         register("uiLibrary") {
-            id = "aiapplication.android.ui.library"
+            id = "aiapplication.ui.library"
             implementationClass = "com.aiapplication.conventions.UILibraryConventionPlugin"
         }
-        register("baseApp") {
-            id = "aiapplication.android.base.app"
-            implementationClass = "com.aiapplication.conventions.BaseAppConventionPlugin"
+        register("kotlinLibrary") {
+            id = "aiapplication.kotlin.library"
+            implementationClass = "com.aiapplication.conventions.KotlinLibraryConventionPlugin"
         }
     }
 }
