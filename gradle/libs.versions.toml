@@ -20,6 +20,7 @@ kotlinx-serialization = "1.11.0"
 composeBom = "2026.05.01"
 camerax = "1.6.1"
 tesseract = "4.9.0"
+material3 = "1.4.0"
 
 
 [libraries]
@@ -61,6 +62,7 @@ camerax-mlkit-vision = { module = "androidx.camera:camera-mlkit-vision", version
 
 # Tesseract
 tesseract4android = { module = "cz.adaptech:tesseract4android", version.ref = "tesseract" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

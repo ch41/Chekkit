@@ -7,4 +7,5 @@ sealed class ScannerIntent : BaseIntent {
     data class TextRecognized(val text: String) : ScannerIntent()
     data object Reset : ScannerIntent()
     data object SaveReceipt : ScannerIntent()
+    data class ProcessImage(val imageData: ByteArray) : ScannerIntent()
 }
