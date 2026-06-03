@@ -7,6 +7,6 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel<DashboardViewModel> { DashboardViewModel() }
-    viewModel<ScannerViewModel> { ScannerViewModel() }
+    viewModel<ScannerViewModel> { ScannerViewModel(get()) }
 
 }

@@ -38,4 +38,5 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:navigation"))
     implementation(project(":core:di"))
+    implementation(project(":feature:scanner:data"))
 }

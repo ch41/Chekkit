@@ -13,6 +13,9 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(libs.androidx.core.ktx)
+    implementation("cz.adaptech:tesseract4android:4.9.0") {
+        exclude(group = "cz.adaptech.tesseract4android", module = "tesseract4android-openmp")
+    }
 
     implementation(project(":core:common"))
     implementation(project(":feature:scanner:domain"))

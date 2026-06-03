@@ -37,7 +37,7 @@ abstract class BaseViewModel<State : Any, Intent : Any, Effect : Any> : ViewMode
     /**
      * Отправить событие из UI.
      */
-    fun sendEvent(event: Intent) {
+    fun sendIntent(event: Intent) {
         viewModelScope.launch {
             handleEvent(event)
         }

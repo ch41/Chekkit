@@ -14,6 +14,7 @@ fun initKoin(
     modules(
         appModule,
         dataModule,
+        repositoryModule,
         viewModelModule
     )
 }

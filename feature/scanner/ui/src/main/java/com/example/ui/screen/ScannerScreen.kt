@@ -2,11 +2,17 @@ package com.example.ui.screen
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.mlkit.vision.MlKitAnalyzer
-import androidx.camera.view.LifecycleCameraController
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,18 +42,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ui.model.ScannerEffect
 import com.example.ui.model.ScannerIntent
 import com.example.ui.model.ScannerState
 import com.example.ui.viewModel.ScannerViewModel
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import org.koin.androidx.compose.koinViewModel
+import java.io.ByteArrayOutputStream
+import android.util.Log
+import androidx.compose.foundation.shape.CircleShape
 
 @Composable
 fun ScannerScreen(
@@ -56,6 +63,7 @@ fun ScannerScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var recognizedText by remember { mutableStateOf<String?>(null) }
+    var captureImage by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -89,15 +97,18 @@ fun ScannerScreen(
         if (!hasCameraPermission) {
             permissionLauncher.launch(Manifest.permission.CAMERA)
         } else {
-            viewModel.sendEvent(ScannerIntent.StartCamera)
+            viewModel.sendIntent(ScannerIntent.StartCamera)
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (hasCameraPermission) {
             CameraPreview(
-                onTextRecognized = { text ->
-                    viewModel.sendEvent(ScannerIntent.TextRecognized(text))
+                onImageCaptured = { imageData ->
+                    viewModel.sendIntent(ScannerIntent.ProcessImage(imageData))
+                },
+                onCaptureReady = { captureFn ->
+                    captureImage = captureFn
                 }
             )
         } else {
@@ -128,7 +139,6 @@ fun ScannerScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = onBack) {
-
                 }
 
                 when (state) {
@@ -145,52 +155,23 @@ fun ScannerScreen(
             }
 
             if (recognizedText != null) {
-                Card(
+                Log.d("recognizedText", "$recognizedText ")
+            } else {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
+                        .padding(bottom = 32.dp),
+                    contentAlignment = Alignment.BottomCenter
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
+                    Button(
+                        onClick = {
+                            Log.d("ScannerScreen", "Capture button clicked")
+                            captureImage?.invoke()
+                        },
+                        modifier = Modifier.size(80.dp),
+                        shape = CircleShape
                     ) {
-                        Text(
-                            text = "Распознанный текст:",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = recognizedText ?: "",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Button(
-                                onClick = {
-                                    recognizedText = null
-                                    viewModel.sendEvent(ScannerIntent.Reset)
-                                },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("Сканировать ещё")
-                            }
-                            Button(
-                                onClick = {
-                                    // TODO: сохранить чек
-                                    viewModel.sendEvent(ScannerIntent.SaveReceipt)
-                                    recognizedText = null
-                                },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("Сохранить")
-                            }
-                        }
+                        Text("📷", fontSize = MaterialTheme.typography.titleLarge.fontSize)
                     }
                 }
             }
@@ -200,37 +181,86 @@ fun ScannerScreen(
 
 @Composable
 private fun CameraPreview(
-    onTextRecognized: (String) -> Unit
+    onImageCaptured: (ByteArray) -> Unit,
+    onCaptureReady: (() -> Unit) -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val textRecognizer = remember { TextRecognition.getClient(TextRecognizerOptions.Builder().build()) }
+    var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }
 
-    val cameraController = remember {
-        LifecycleCameraController(context).apply {
-            setImageAnalysisAnalyzer(
-                ContextCompat.getMainExecutor(context),
-                MlKitAnalyzer(
-                    listOf(textRecognizer),
-                    ImageAnalysis.COORDINATE_SYSTEM_VIEW_REFERENCED,
-                    ContextCompat.getMainExecutor(context)
-                ) { result ->
-                    val recognizedText = result?.getValue(textRecognizer)?.text
-                    if (!recognizedText.isNullOrEmpty()) {
-                        onTextRecognized(recognizedText)
+    LaunchedEffect(imageCapture) {
+        if (imageCapture != null) {
+            onCaptureReady {
+                imageCapture?.takePicture(
+                    ContextCompat.getMainExecutor(context),
+                    object : ImageCapture.OnImageCapturedCallback() {
+                        override fun onCaptureSuccess(image: ImageProxy) {
+                            val bitmap = imageProxyToBitmap(image)
+                            image.close()
+                            if (bitmap != null) {
+                                val stream = ByteArrayOutputStream()
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
+                                val imageData = stream.toByteArray()
+                                onImageCaptured(imageData)
+                                bitmap.recycle()
+                            } else {
+                                Log.e("CameraPreview", "Bitmap is null")
+                            }
+                        }
+
+                        override fun onError(exception: ImageCaptureException) {
+                            Log.e("CameraPreview", "onError: ${exception.message}", exception)
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
 
     AndroidView(
         factory = { ctx ->
             PreviewView(ctx).apply {
-                this.controller = cameraController
-                cameraController.bindToLifecycle(lifecycleOwner)
+                val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+
+                cameraProviderFuture.addListener({
+                    try {
+                        val cameraProvider = cameraProviderFuture.get()
+
+                        val preview = Preview.Builder().build().also {
+                            it.setSurfaceProvider(surfaceProvider)
+                        }
+
+                        imageCapture = ImageCapture.Builder()
+                            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                            .build()
+
+                        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                        cameraProvider.unbindAll()
+                        cameraProvider.bindToLifecycle(
+                            lifecycleOwner,
+                            cameraSelector,
+                            preview,
+                            imageCapture
+                        )
+                    } catch (e: Exception) {
+                        Log.e("CameraPreview", "Camera init failed", e)
+                    }
+                }, ContextCompat.getMainExecutor(context))
             }
         },
         modifier = Modifier.fillMaxSize()
     )
+}
+private fun imageProxyToBitmap(image: ImageProxy): Bitmap? {
+    val buffer = image.planes[0].buffer
+    val bytes = ByteArray(buffer.remaining())
+    buffer.get(bytes)
+
+    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+
+    val matrix = Matrix().apply {
+        postRotate(image.imageInfo.rotationDegrees.toFloat())
+    }
+
+    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
 }

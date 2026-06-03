@@ -9,6 +9,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -24,5 +25,6 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:presentation"))
     implementation(project(":core:design"))
+    implementation(project(":feature:scanner:domain"))
 
 }
