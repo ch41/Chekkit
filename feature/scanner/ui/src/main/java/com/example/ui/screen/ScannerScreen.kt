@@ -72,7 +72,6 @@ fun ScannerScreen(
                     recognizedText = effect.text
                 }
                 is ScannerEffect.ShowToast -> {
-                    // TODO: показать тост
                 }
             }
         }

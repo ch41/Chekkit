@@ -23,7 +23,6 @@ class ScannerViewModel(
             }
             is ScannerIntent.TextRecognized -> {
                 setState { ScannerState.Processing }
-                delay(500)
                 setState { ScannerState.Recognized(event.text) }
                 sendEffect(NavigateToReceiptForm(event.text))
             }
