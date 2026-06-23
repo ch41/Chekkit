@@ -6,7 +6,16 @@ import kotlinx.serialization.Serializable
 sealed class AppDestinations {
 
     @Serializable
-    data object Dashboard : AppDestinations()
+    data object Home : AppDestinations()
+
+    @Serializable
+    data object Receipts : AppDestinations()
+
+    @Serializable
+    data object Insights : AppDestinations()
+
+    @Serializable
+    data object Settings : AppDestinations()
 
     @Serializable
     data object Scanner : AppDestinations()
