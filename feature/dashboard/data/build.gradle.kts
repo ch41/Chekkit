@@ -15,5 +15,5 @@ dependencies {
     implementation(libs.androidx.core.ktx)
 
     implementation(project(":core:common"))
-    implementation(project(":feature:scanner:domain"))
+    implementation(project(":feature:dashboard:domain"))
 }

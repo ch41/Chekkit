@@ -1,10 +1,11 @@
 package com.example.ui.model
 
+import com.example.domain.model.DashboardData
 import com.example.presentation.BaseState
 
 sealed class DashboardState : BaseState {
-    object Loading : DashboardState()
-    data class Success(val data: List<String>) : DashboardState()
+    data object Loading : DashboardState()
+    data class Success(val data: DashboardData) : DashboardState()
     data class Error(val message: String) : DashboardState()
-    object Idle : DashboardState()
+    data object Idle : DashboardState()
 }
