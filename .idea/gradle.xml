@@ -36,6 +36,10 @@
             <option value="$PROJECT_DIR$/feature/dashboard/data" />
             <option value="$PROJECT_DIR$/feature/dashboard/domain" />
             <option value="$PROJECT_DIR$/feature/dashboard/ui" />
+            <option value="$PROJECT_DIR$/feature/receipts" />
+            <option value="$PROJECT_DIR$/feature/receipts/data" />
+            <option value="$PROJECT_DIR$/feature/receipts/domain" />
+            <option value="$PROJECT_DIR$/feature/receipts/ui" />
             <option value="$PROJECT_DIR$/feature/scanner" />
             <option value="$PROJECT_DIR$/feature/scanner/data" />
             <option value="$PROJECT_DIR$/feature/scanner/domain" />

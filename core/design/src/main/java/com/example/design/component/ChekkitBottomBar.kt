@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.design.theme.ChekkitTheme
 
 @Composable
 fun ChekkitBottomBar(
@@ -24,6 +25,9 @@ fun ChekkitBottomBar(
     onItemSelected: (Int) -> Unit,
     onCameraClick: () -> Unit
 ) {
+    val dimen = ChekkitTheme.dimensions
+    val colorScheme = MaterialTheme.colorScheme
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -34,37 +38,32 @@ fun ChekkitBottomBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(80.dp),
-            containerColor = Color(0xFF111D23), // Dark background matching the design
-            tonalElevation = 8.dp
+            containerColor = colorScheme.surface,
+            tonalElevation = dimen.paddingSmall
         ) {
+            val itemColors = NavigationBarItemDefaults.colors(
+                selectedIconColor = colorScheme.primary,
+                selectedTextColor = colorScheme.primary,
+                unselectedIconColor = colorScheme.onSurfaceVariant,
+                unselectedTextColor = colorScheme.onSurfaceVariant,
+                indicatorColor = Color.Transparent
+            )
+
             NavigationBarItem(
                 selected = selectedIndex == 0,
                 onClick = { onItemSelected(0) },
                 icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                 label = { Text("Home") },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFF1DB954),
-                    selectedTextColor = Color(0xFF1DB954),
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray,
-                    indicatorColor = Color.Transparent
-                )
+                colors = itemColors
             )
             NavigationBarItem(
                 selected = selectedIndex == 1,
                 onClick = { onItemSelected(1) },
                 icon = { Icon(Icons.Default.List, contentDescription = "Receipts") },
                 label = { Text("Receipts") },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFF1DB954),
-                    selectedTextColor = Color(0xFF1DB954),
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray,
-                    indicatorColor = Color.Transparent
-                )
+                colors = itemColors
             )
             
-            // Spacer for the center button
             Spacer(modifier = Modifier.weight(1f))
 
             NavigationBarItem(
@@ -72,30 +71,18 @@ fun ChekkitBottomBar(
                 onClick = { onItemSelected(2) },
                 icon = { Icon(Icons.Default.PieChart, contentDescription = "Insights") },
                 label = { Text("Insights") },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFF1DB954),
-                    selectedTextColor = Color(0xFF1DB954),
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray,
-                    indicatorColor = Color.Transparent
-                )
+                colors = itemColors
             )
             NavigationBarItem(
                 selected = selectedIndex == 3,
                 onClick = { onItemSelected(3) },
                 icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
                 label = { Text("Settings") },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFF1DB954),
-                    selectedTextColor = Color(0xFF1DB954),
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray,
-                    indicatorColor = Color.Transparent
-                )
+                colors = itemColors
             )
         }
 
-        // The Center Camera Button (Floating Action Button style)
+        // The Center Camera Button
         Box(
             modifier = Modifier
                 .size(70.dp)
@@ -104,8 +91,8 @@ fun ChekkitBottomBar(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFF1DB954), // Glowy green
-                            Color(0xFF004D40)
+                            colorScheme.primary,
+                            colorScheme.primaryContainer
                         )
                     )
                 )
@@ -116,7 +103,7 @@ fun ChekkitBottomBar(
                 Icon(
                     imageVector = Icons.Outlined.PhotoCamera,
                     contentDescription = "Camera",
-                    tint = Color.White,
+                    tint = colorScheme.onPrimary,
                     modifier = Modifier.size(32.dp)
                 )
             }
